@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "playwright": "^1.56.1"
+  },
+  "name": "playwright-advanced-encryption",
+  "version": "1.0.0",
+  "description": "The **Playwright Advanced Encryption** module is a **secure encryption and environment key rotation system** designed specifically for **Playwright automation projects**.\r It provides a robust mechanism to **protect sensitive credentials** and secrets used during automated testing, ensuring security and compliance in CI/CD pipelines.",
+  "main": "index.js",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.8.1"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sinugotshifhiwa4/playwright-advanced-encryption.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/sinugotshifhiwa4/playwright-advanced-encryption/issues"
+  },
+  "homepage": "https://github.com/sinugotshifhiwa4/playwright-advanced-encryption#readme"
+}
