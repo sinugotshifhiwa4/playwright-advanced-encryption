@@ -33,7 +33,7 @@
     "check": "npm run type:check && npm run lint",
     "pretest:encryption": "npm run check",
     "pretest:failed": "npm run check",
-    "test:encryption": "npx playwright test tests/encryption",
+    "test:encryption": "npx playwright test tests/crypto",
     "test:failed": "npx playwright test --last-failed",
     "ui": "npx playwright test --ui",
     "record": "npx playwright codegen",
