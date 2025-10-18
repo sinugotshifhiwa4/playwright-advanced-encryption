@@ -27,6 +27,17 @@
     "typescript-eslint": "8.46.1"
   },
   "scripts": {
+    "type:check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.js",
+    "check": "npm run type:check && npm run lint",
+    "pretest:encryption": "npm run check",
+    "pretest:failed": "npm run check",
+    "test:encryption": "npx playwright test tests/encryption",
+    "test:failed": "npx playwright test --last-failed",
+    "ui": "npx playwright test --ui",
+    "record": "npx playwright codegen",
+    "debug": "npx playwright test --debug",
+    "report": "npx playwright show-report",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -42,7 +53,21 @@
     "type": "git",
     "url": "git+https://github.com/sinugotshifhiwa4/playwright-advanced-encryption.git"
   },
-  "keywords": [],
+  "keywords": [
+    "playwright",
+    "typescript",
+    "e2e",
+    "unit",
+    "sanity",
+    "regression",
+    "report",
+    "winston",
+    "dotenv",
+    "cross-env",
+    "eslint",
+    "prettier",
+    "argon2"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",

@@ -6,3 +6,18 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/logs/
+/downloads/
+/ortoni-report/
+/.auth/
+/downloads/
+results.trx
+results.xml
+
+# Environment configuration
+.env*
+!*.template
+
+
+# Intentionally tracked
+# .vscode/ - keeping this tracked as it contains project-specific prettier setup
