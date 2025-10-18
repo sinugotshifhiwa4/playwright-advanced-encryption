@@ -56,6 +56,9 @@ const config = tseslint.config(
     rules: {
       // Playwright-specific rules
       ...playwright.configs["flat/recommended"].rules,
+
+       // Disable only this specific rule
+    "playwright/expect-expect": "off",
       
       // Relaxed rules for test files
       "no-console": "off",

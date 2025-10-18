@@ -23,7 +23,8 @@
     "viewports",
     "maxsize",
     "Ortoni",
-    "uncolorize"
+    "uncolorize",
+    "Encryptor "
   ],
   "cSpell.ignorePaths": [
     "node_modules/**",
