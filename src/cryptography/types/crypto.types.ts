@@ -8,6 +8,8 @@ export type OutputFormat = "base64" | "hex" | "buffer";
  */
 export type CryptoType = "salt" | "secretKey" | "iv" | "random";
 
+export type NodeCryptoKey = import("crypto").webcrypto.CryptoKey;
+
 /**
  * Options interface for unified cryptographic value generation
  */
