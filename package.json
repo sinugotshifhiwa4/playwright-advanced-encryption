@@ -1,16 +1,43 @@
 {
   "dependencies": {
-    "playwright": "^1.56.1"
+    "argon2": "^0.44.0",
+    "axios": "^1.12.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.2.3",
+    "moment-timezone": "^0.6.0",
+    "playwright": "^1.56.1",
+    "winston": "^3.18.3"
   },
   "name": "playwright-advanced-encryption",
   "version": "1.0.0",
-  "description": "The **Playwright Advanced Encryption** module is a **secure encryption and environment key rotation system** designed specifically for **Playwright automation projects**.\r It provides a robust mechanism to **protect sensitive credentials** and secrets used during automated testing, ensuring security and compliance in CI/CD pipelines.",
-  "main": "index.js",
+  "description": "A secure encryption and key rotation system for Playwright automation. It safeguards sensitive credentials and secrets used in automated testing, ensuring robust security and compliance.",
   "devDependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@playwright/test": "^1.56.1",
-    "@types/node": "^24.8.1"
+    "@types/node": "^24.8.1",
+    "cspell": "9.2.1",
+    "eslint": "9.38.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.4",
+    "ortoni-report": "4.0.1",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.1"
   },
-  "scripts": {},
+  "scripts": {
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sinugotshifhiwa4/playwright-advanced-encryption.git"
