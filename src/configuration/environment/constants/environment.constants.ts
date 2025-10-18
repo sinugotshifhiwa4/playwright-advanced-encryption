@@ -1,6 +1,7 @@
 export const ENVIRONMENT_CONSTANTS = {
   ROOT: "envs",
   BASE_FILE: ".env",
+  SECRET_FILE_PREFIX: "secret",
   SECRET_KEY_VAR_PREFIX: "SECRET_KEY",
 } as const;
 
