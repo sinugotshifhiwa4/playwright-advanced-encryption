@@ -29,6 +29,15 @@
   "scripts": {
     "prepare": "husky"
   },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sinugotshifhiwa4/playwright-advanced-encryption.git"
