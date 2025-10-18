@@ -1,0 +1,45 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cSpell.words": [
+    "Tshifhiwa",
+    "Sinugo",
+    "esbenp",
+    "ciphertext",
+    "Logform",
+    "viewports",
+    "maxsize",
+    "Ortoni",
+    "uncolorize"
+  ],
+  "cSpell.ignorePaths": [
+    "node_modules/**",
+    "logs/**",
+    "downloads/**",
+    "playwright-report/**",
+    "src/testData/**"
+  ],
+  "cSpell.allowCompoundWords": true,
+  "cSpell.caseSensitive": false,
+  "workbench.colorCustomizations": {
+    "activityBar.activeBackground": "#2f7c47",
+    "titleBar.inactiveForeground": "#e7e7e799"
+  },
+  "peacock.color": "#215732",
+  "[groovy]": {
+    "editor.defaultFormatter": "NicolasVuillamy.vscode-groovy-lint"
+  }
+}
