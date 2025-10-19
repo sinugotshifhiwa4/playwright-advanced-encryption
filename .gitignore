@@ -11,6 +11,8 @@ node_modules/
 /ortoni-report/
 /.auth/
 /downloads/
+/cryptoTracking/
+/cryptoAudit/
 results.trx
 results.xml
 
