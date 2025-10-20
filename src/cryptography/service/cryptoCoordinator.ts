@@ -5,7 +5,6 @@ import SecureKeyGenerator from "../key/secureKeyGenerator";
 import ErrorHandler from "../../utils/errorHandling/errorHandler";
 import SecretKeyTracker from "../../cryptography/key/rotation/secretKeyTracker";
 import EnvironmentDetector from "../../configuration/detector/environmentDetector";
-import { SecretKeyRotationManager } from "../key/rotation/secretKeyRotationManager";
 import logger from "../../utils/logger/loggerManager";
 
 /**
@@ -19,15 +18,10 @@ import logger from "../../utils/logger/loggerManager";
  */
 export class CryptoCoordinator {
   private environmentFileEncryptor: EnvironmentFileEncryptor;
-  private secretKeyRotationManager: SecretKeyRotationManager;
   private readonly currentEnvironmentStage = EnvironmentDetector.getCurrentEnvironmentStage();
 
-  constructor(
-    environmentFileEncryptor: EnvironmentFileEncryptor,
-    secretKeyRotationManager: SecretKeyRotationManager,
-  ) {
+  constructor(environmentFileEncryptor: EnvironmentFileEncryptor) {
     this.environmentFileEncryptor = environmentFileEncryptor;
-    this.secretKeyRotationManager = secretKeyRotationManager;
   }
 
   /**

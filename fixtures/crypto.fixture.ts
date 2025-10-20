@@ -31,8 +31,8 @@ export const test = baseTest.extend<CryptoFixtures>({
     await use(new SecretKeyRotationManager());
   },
 
-  cryptoCoordinator: async ({ environmentFileEncryptor, secretKeyRotationManager }, use) => {
-    await use(new CryptoCoordinator(environmentFileEncryptor, secretKeyRotationManager));
+  cryptoCoordinator: async ({ environmentFileEncryptor }, use) => {
+    await use(new CryptoCoordinator(environmentFileEncryptor));
   },
 });
 
