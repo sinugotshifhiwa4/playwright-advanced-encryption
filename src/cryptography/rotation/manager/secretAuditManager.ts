@@ -1,11 +1,11 @@
-import SecretKeyFileManager from "./secretKeyFileManager";
+import SecretFileManager from "./secretFileManager";
+import * as path from "path";
+import CryptoConstants from "../types/cryptoConstants";
+import { AuditLogEntry, AuditLogFile } from "../types/audit.types";
 import ErrorHandler from "../../../utils/errorHandling/errorHandler";
 import logger from "../../../utils/logger/loggerManager";
-import * as path from "path";
-import { AuditLogEntry, AuditLogFile } from "./rotation.type";
-import RotationConstants from "./rotationConstants";
 
-export default class SecretKeyAuditManager {
+export default class SecretAuditManager {
   /**
    * Logs an audit entry.
    */
@@ -71,12 +71,12 @@ export default class SecretKeyAuditManager {
 
   // Private file operations
   private static getFilePath(filename: string): string {
-    return path.join(process.cwd(), RotationConstants.TRACKING_DIR, filename);
+    return path.join(process.cwd(), CryptoConstants.TRACKING_DIR, filename);
   }
 
   private static async loadAuditLog(): Promise<AuditLogFile> {
-    const filePath = this.getFilePath(RotationConstants.AUDIT_FILE);
-    return SecretKeyFileManager.loadJsonFile<AuditLogFile>(filePath, {
+    const filePath = this.getFilePath(CryptoConstants.AUDIT_FILE);
+    return SecretFileManager.loadJsonFile<AuditLogFile>(filePath, {
       logs: [],
       totalEntries: 0,
       lastAudit: new Date().toISOString(),
@@ -84,7 +84,7 @@ export default class SecretKeyAuditManager {
   }
 
   private static async saveAuditLog(data: AuditLogFile): Promise<void> {
-    const filePath = this.getFilePath(RotationConstants.AUDIT_FILE);
-    await SecretKeyFileManager.saveJsonFile(filePath, data);
+    const filePath = this.getFilePath(CryptoConstants.AUDIT_FILE);
+    await SecretFileManager.saveJsonFile(filePath, data);
   }
 }

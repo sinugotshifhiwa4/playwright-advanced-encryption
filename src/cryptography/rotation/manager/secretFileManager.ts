@@ -1,15 +1,15 @@
 import { AsyncFileManager } from "../../../utils/fileManager/asyncFileManager";
+import * as path from "path";
+import CryptoConstants from "../types/cryptoConstants";
 import { FileEncoding } from "../../../utils/fileManager/internal/file-encoding.enum";
 import logger from "../../../utils/logger/loggerManager";
-import * as path from "path";
-import RotationConstants from "./rotationConstants";
 
-export default class SecretKeyFileManager {
+export default class SecretFileManager {
   /**
    * Gets the full file path for a tracking file.
    */
   public static getFilePath(filename: string): string {
-    return path.join(process.cwd(), RotationConstants.TRACKING_DIR, filename);
+    return path.join(process.cwd(), CryptoConstants.TRACKING_DIR, filename);
   }
 
   /**
@@ -44,7 +44,7 @@ export default class SecretKeyFileManager {
    * Ensures the tracking directory exists.
    */
   public static async ensureTrackingDirectoryExists(): Promise<void> {
-    const dirPath = path.join(process.cwd(), RotationConstants.TRACKING_DIR);
+    const dirPath = path.join(process.cwd(), CryptoConstants.TRACKING_DIR);
     const dirExists = await AsyncFileManager.doesFileExist(dirPath);
 
     if (!dirExists) {

@@ -1,10 +1,11 @@
-import { test, expect } from "../../fixtures/crypto.fixture";
-import SecretKeyRotationManager from "../../src/cryptography/manager/rotation/secretKeyRotationManager";
-import { getCurrentUser } from "../../src/cryptography/manager/rotation/getSystemUser";
+import { test, expect } from "../../../fixtures/crypto.fixture";
+import RotationOrchestrator from "../../../src/cryptography/service/rotationOrchestrator";
+import SystemInfo from "../../../src/utils/systemInfo";
+import logger from "../../../src/utils/logger/loggerManager";
 
 test.describe.serial("Key Rotation Flow @key-rotation", () => {
   test("Check rotation status before rotation", async () => {
-    const status = await SecretKeyRotationManager.checkRotationStatus();
+    const status = await RotationOrchestrator.checkRotationStatus();
 
     expect(status).toHaveProperty("needsRotation");
     expect(status).toHaveProperty("recommendation");
@@ -15,14 +16,14 @@ test.describe.serial("Key Rotation Flow @key-rotation", () => {
     expect(typeof status.details.daysUntilExpiration).toBe("number");
     expect(typeof status.details.encryptedVariableCount).toBe("number");
 
-    console.log(`Rotation Status: ${status.recommendation}`);
+    logger.info(`Verified: Rotation Status: ${status.recommendation}`);
   });
 
   test("Rotate secret key with re-encryption", async () => {
-    const result = await SecretKeyRotationManager.rotateKeyWithReEncryption({
+    const result = await RotationOrchestrator.rotateKeyWithReEncryption({
       rotationReason: "manual",
       rotationDays: 90,
-      performedBy: getCurrentUser(),
+      performedBy: SystemInfo.getCurrentUsername(),
       forceRotation: true,
       dryRun: false,
     });
@@ -36,11 +37,13 @@ test.describe.serial("Key Rotation Flow @key-rotation", () => {
     expect(result.newKeyHash).toBeDefined();
     expect(result.duration).toBeGreaterThan(0);
 
-    console.log(`Rotation completed: ${result.variablesProcessed} variables re-encrypted in ${result.duration}ms`);
+    logger.info(
+      `Verified: Rotation completed: ${result.variablesProcessed} variables re-encrypted in ${result.duration}ms`,
+    );
   });
 
   test("Verify rotation status after rotation", async () => {
-    const status = await SecretKeyRotationManager.checkRotationStatus();
+    const status = await RotationOrchestrator.checkRotationStatus();
 
     expect(status.needsRotation).toBe(false);
     expect(status.details.status).toBe("active");
@@ -48,13 +51,13 @@ test.describe.serial("Key Rotation Flow @key-rotation", () => {
     expect(status.details.metadata?.rotationCount).toBeGreaterThan(0);
     expect(status.details.metadata?.createdAt).toBeTruthy();
 
-    console.log(`Key has been rotated ${status.details.metadata?.rotationCount} time(s)`);
+    logger.info(`Verified: Key has been rotated ${status.details.metadata?.rotationCount} time(s)`);
   });
 
   test("Dry run rotation", async () => {
-    const result = await SecretKeyRotationManager.rotateKeyWithReEncryption({
+    const result = await RotationOrchestrator.rotateKeyWithReEncryption({
       rotationReason: "manual",
-      performedBy: getCurrentUser(),
+      performedBy: SystemInfo.getCurrentUsername(),
       forceRotation: true,
       dryRun: true,
     });
@@ -64,6 +67,6 @@ test.describe.serial("Key Rotation Flow @key-rotation", () => {
     expect(result.oldKeyHash).toBeUndefined();
     expect(result.newKeyHash).toBeUndefined();
 
-    console.log(`[DRY RUN] Would process ${result.variablesProcessed} variables`);
+    logger.info(`Verified: [DRY RUN] Would process ${result.variablesProcessed} variables`);
   });
 });

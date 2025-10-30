@@ -1,21 +1,12 @@
+import EnvironmentDetector from "../../configuration/detector/environmentDetector";
+import SecureKeyGenerator from "../key/secureKeyGenerator";
 import { EnvironmentFileEncryptor } from "../manager/environmentFileEncryptor";
 import ConfigurationResolver from "../../configuration/environment/manager/configurationResolver";
 import SecretFileManager from "../../configuration/environment/manager/secretFileManager";
-import SecureKeyGenerator from "../key/secureKeyGenerator";
+import SecretMetadataManager from "../rotation/manager/secretMetadataManager";
 import ErrorHandler from "../../utils/errorHandling/errorHandler";
-import SecretKeyMetadataManager from "./../manager/rotation/secretKeyMetadataManager";
-import EnvironmentDetector from "../../configuration/detector/environmentDetector";
 import logger from "../../utils/logger/loggerManager";
 
-/**
- * CryptoCoordinator - Simplified coordinator for basic crypto operations
- *
- * Responsibilities:
- * - Generate and store new secret keys
- * - Encrypt environment variables
- *
- * For key rotation, audits, and advanced operations, use SecretKeyRotationManager
- */
 export class CryptoCoordinator {
   private environmentFileEncryptor: EnvironmentFileEncryptor;
   private readonly currentEnvironmentStage = EnvironmentDetector.getCurrentEnvironmentStage();
@@ -43,9 +34,9 @@ export class CryptoCoordinator {
       const currentEnv = this.currentEnvironmentStage;
 
       // Check if key already exists and if rotation is needed
-      const existingMetadata = await SecretKeyMetadataManager.getKeyMetadata(currentEnvKey);
+      const existingMetadata = await SecretMetadataManager.getKeyMetadata(currentEnvKey);
       if (existingMetadata) {
-        const rotationStatus = await SecretKeyMetadataManager.checkKeyRotationStatus(currentEnvKey);
+        const rotationStatus = await SecretMetadataManager.checkKeyRotationStatus(currentEnvKey);
 
         if (rotationStatus.needsRotation) {
           logger.warn(
@@ -70,7 +61,7 @@ export class CryptoCoordinator {
 
       // Track the secret key creation (only if it was actually created)
       if (!existingMetadata) {
-        await SecretKeyMetadataManager.trackSecretKey(currentEnvKey, currentEnv, {
+        await SecretMetadataManager.trackSecretKey(currentEnvKey, currentEnv, {
           rotationDays,
           isRotation: false,
           algorithm: "base64",
@@ -101,7 +92,7 @@ export class CryptoCoordinator {
       const currentEnvKey = ConfigurationResolver.getCurrentEnvSecretKey();
 
       // Verify key exists and is valid before encrypting
-      const rotationStatus = await SecretKeyMetadataManager.checkKeyRotationStatus(currentEnvKey);
+      const rotationStatus = await SecretMetadataManager.checkKeyRotationStatus(currentEnvKey);
 
       if (rotationStatus.status === "expired") {
         logger.warn(

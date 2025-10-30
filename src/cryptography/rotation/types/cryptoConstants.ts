@@ -1,4 +1,4 @@
-export default class RotationConstants {
+export default class CryptoConstants {
   public static readonly TRACKING_DIR = "cryptoAuditTracker";
   public static readonly METADATA_FILE = "keys.json";
   public static readonly ROTATION_FILE = "rotations.json";

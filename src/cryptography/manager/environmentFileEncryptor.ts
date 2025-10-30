@@ -1,12 +1,12 @@
 import { CryptoService } from "../service/cryptoService";
+import EnvironmentDetector from "../../configuration/detector/environmentDetector";
 import { SyncFileManager } from "../../utils/fileManager/syncFileManager";
 import StagesFileManager from "../../configuration/environment/manager/stagesFileManager";
-import { CRYPTO_CONSTANTS } from "../types/crypto.config";
+import EncryptionTracker from "../rotation/manager/encryptionTrackerManager";
 import ConfigurationResolver from "../../configuration/environment/manager/configurationResolver";
+import { CRYPTO_CONSTANTS } from "../types/crypto.config";
 import ErrorHandler from "../../utils/errorHandling/errorHandler";
 import logger from "../../utils/logger/loggerManager";
-import EnvironmentDetector from "../../configuration/detector/environmentDetector";
-import SecretKeyEncryptionTracker from "./rotation/secretKeyEncryptionTracker";
 
 export class EnvironmentFileEncryptor {
   public async encryptEnvironmentVariables(envVariables?: string[]): Promise<void> {
@@ -20,42 +20,6 @@ export class EnvironmentFileEncryptor {
       "Failed to encrypt environment variables",
     );
   }
-
-  // private async encryptAndUpdateEnvironmentVariables(
-  //   filePath: string,
-  //   secretKeyVariable: string,
-  //   envVariables?: string[],
-  // ): Promise<void> {
-  //   const envFileLines = await StagesFileManager.readEnvironmentFileAsLines(filePath);
-  //   const allEnvVariables = StagesFileManager.extractEnvironmentVariables(envFileLines);
-
-  //   if (Object.keys(allEnvVariables).length === 0) {
-  //     logger.warn(`No environment variables found in ${filePath}`);
-  //     return;
-  //   }
-
-  //   const variablesToEncrypt = this.resolveVariablesToEncrypt(allEnvVariables, envVariables);
-
-  //   if (Object.keys(variablesToEncrypt).length === 0) {
-  //     return;
-  //   }
-
-  //   const { updatedLines, encryptedCount } = await this.encryptVariableValuesInFileLines(
-  //     envFileLines,
-  //     variablesToEncrypt,
-  //     secretKeyVariable,
-  //   );
-
-  //   if (encryptedCount > 0) {
-  //     await StagesFileManager.writeEnvironmentFileLines(filePath, updatedLines);
-  //   }
-
-  //   await this.logEncryptionSummary(
-  //     filePath,
-  //     Object.keys(variablesToEncrypt).length,
-  //     encryptedCount,
-  //   );
-  // }
 
   // environmentFileEncryptor.ts - UPDATE encryptAndUpdateEnvironmentVariables method
   private async encryptAndUpdateEnvironmentVariables(
@@ -110,7 +74,7 @@ export class EnvironmentFileEncryptor {
     const durationMs = Date.now() - startTime;
     const environment = EnvironmentDetector.getCurrentEnvironmentStage();
 
-    await SecretKeyEncryptionTracker.trackEncryption(secretKeyVariable, environment, {
+    await EncryptionTracker.trackEncryption(secretKeyVariable, environment, {
       variablesEncrypted: Object.keys(variablesToEncrypt),
       alreadyEncrypted,
       emptyVariables: emptyValues,

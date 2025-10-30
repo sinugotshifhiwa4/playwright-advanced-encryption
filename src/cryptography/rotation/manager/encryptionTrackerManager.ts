@@ -1,13 +1,13 @@
 // secretKeyEncryptionTracker.ts - NEW FILE
-import SecretKeyFileManager from "./secretKeyFileManager";
+import SecretKeyFileManager from "./secretFileManager";
+import SecretKeyAuditManager from "./secretAuditManager";
+import SystemInfo from "../../../utils/systemInfo";
+import CryptoConstants from "../types/cryptoConstants";
+import { EncryptionEntry, EncryptionTrackingFile } from "../types/encryptionTracking.types";
 import ErrorHandler from "../../../utils/errorHandling/errorHandler";
 import logger from "../../../utils/logger/loggerManager";
-import RotationConstants from "./rotationConstants";
-import { EncryptionEntry, EncryptionTrackingFile } from "./rotation.type";
-import SecretKeyAuditManager from "./secretKeyAuditManager";
-import { getCurrentUser } from "./getSystemUser";
 
-export default class SecretKeyEncryptionTracker {
+export default class EncryptionTrackerManager {
   /**
    * Records an encryption operation.
    */
@@ -29,7 +29,7 @@ export default class SecretKeyEncryptionTracker {
         skippedVariables = [],
         alreadyEncrypted = [],
         emptyVariables = [],
-        performedBy = getCurrentUser(),
+        performedBy = SystemInfo.getCurrentUsername(),
         durationMs,
       } = options;
 
@@ -54,10 +54,10 @@ export default class SecretKeyEncryptionTracker {
       encryptionFile.lastEncryption = now;
 
       // Keep only last 10000 entries
-      if (encryptionFile.encryptions.length > RotationConstants.MAX_AUDIT_ENTRIES) {
+      if (encryptionFile.encryptions.length > CryptoConstants.MAX_AUDIT_ENTRIES) {
         encryptionFile.encryptions = encryptionFile.encryptions.slice(
           0,
-          RotationConstants.MAX_AUDIT_ENTRIES,
+          CryptoConstants.MAX_AUDIT_ENTRIES,
         );
       }
 
@@ -161,7 +161,7 @@ export default class SecretKeyEncryptionTracker {
 
   // Private file operations
   private static async loadEncryptionTracking(): Promise<EncryptionTrackingFile> {
-    const filePath = SecretKeyFileManager.getFilePath(RotationConstants.ENCRYPTION_FILE);
+    const filePath = SecretKeyFileManager.getFilePath(CryptoConstants.ENCRYPTION_FILE);
     return SecretKeyFileManager.loadJsonFile<EncryptionTrackingFile>(filePath, {
       encryptions: [],
       totalEncryptions: 0,
@@ -170,7 +170,7 @@ export default class SecretKeyEncryptionTracker {
   }
 
   private static async saveEncryptionTracking(data: EncryptionTrackingFile): Promise<void> {
-    const filePath = SecretKeyFileManager.getFilePath(RotationConstants.ENCRYPTION_FILE);
+    const filePath = SecretKeyFileManager.getFilePath(CryptoConstants.ENCRYPTION_FILE);
     await SecretKeyFileManager.saveJsonFile(filePath, data);
   }
 }

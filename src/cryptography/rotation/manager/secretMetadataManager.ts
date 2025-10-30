@@ -1,13 +1,13 @@
 import { AsyncFileManager } from "../../../utils/fileManager/asyncFileManager";
-import SecretKeyFileManager from "./secretKeyFileManager";
+import SecretFileManager from "./secretFileManager";
+import SecretAuditManager from "./secretAuditManager";
+import * as path from "path";
+import KeyExpirationCalculator from "../utils/keyExpirationCalculator";
+import SystemInfo from "../../../utils/systemInfo";
+import CryptoConstants from "../types/cryptoConstants";
+import { SecretKeyMetadata, KeyMetadataFile } from "../types/metadata.types";
 import ErrorHandler from "../../../utils/errorHandling/errorHandler";
 import logger from "../../../utils/logger/loggerManager";
-import * as path from "path";
-import KeyExpirationCalculator from "./keyExpirationCalculator";
-import { SecretKeyMetadata, KeyMetadataFile } from "./rotation.type";
-import SecretKeyAuditManager from "./secretKeyAuditManager";
-import RotationConstants from "./rotationConstants";
-import { getCurrentUser } from "./getSystemUser";
 
 export default class SecretKeyMetadataManager {
   public static async trackSecretKey(
@@ -23,11 +23,11 @@ export default class SecretKeyMetadataManager {
   ): Promise<void> {
     try {
       const {
-        rotationDays = RotationConstants.DEFAULT_ROTATION_DAYS,
+        rotationDays = CryptoConstants.DEFAULT_ROTATION_DAYS,
         isRotation = false,
         algorithm = "base64",
         keyLength = 256,
-        performedBy = getCurrentUser(),
+        performedBy = SystemInfo.getCurrentUsername(),
       } = options;
 
       await this.ensureTrackingDirectoryExists();
@@ -57,7 +57,7 @@ export default class SecretKeyMetadataManager {
       metadataFile.lastUpdated = now;
       await this.saveKeyMetadata(metadataFile);
 
-      await SecretKeyAuditManager.logAudit({
+      await SecretAuditManager.logAudit({
         action: isRotation ? "rotate" : "create",
         keyName,
         environment,
@@ -223,7 +223,7 @@ export default class SecretKeyMetadataManager {
       if (!metadataFile.keys[keyName]) {
         logger.warn(`Key "${keyName}" is not currently tracked (attempted by ${performedBy})`);
 
-        await SecretKeyAuditManager.logAudit({
+        await SecretAuditManager.logAudit({
           action: "delete",
           keyName,
           environment: "unknown",
@@ -243,7 +243,7 @@ export default class SecretKeyMetadataManager {
         `Secret key "${keyName}" removed from tracking by ${performedBy} (Environment: ${deletedKey.environment})`,
       );
 
-      await SecretKeyAuditManager.logAudit({
+      await SecretAuditManager.logAudit({
         action: "delete",
         keyName,
         environment: deletedKey.environment,
@@ -258,7 +258,7 @@ export default class SecretKeyMetadataManager {
         `Failed to untrack secret key "${keyName}" by ${performedBy}`,
       );
 
-      await SecretKeyAuditManager.logAudit({
+      await SecretAuditManager.logAudit({
         action: "delete",
         keyName,
         environment: "unknown",
@@ -272,7 +272,7 @@ export default class SecretKeyMetadataManager {
 
   // Private file operations
   private static async ensureTrackingDirectoryExists(): Promise<void> {
-    const dirPath = path.join(process.cwd(), RotationConstants.TRACKING_DIR);
+    const dirPath = path.join(process.cwd(), CryptoConstants.TRACKING_DIR);
     const dirExists = await AsyncFileManager.doesFileExist(dirPath);
 
     if (!dirExists) {
@@ -282,15 +282,15 @@ export default class SecretKeyMetadataManager {
   }
 
   private static async loadKeyMetadata(): Promise<KeyMetadataFile> {
-    const filePath = SecretKeyFileManager.getFilePath(RotationConstants.METADATA_FILE);
-    return SecretKeyFileManager.loadJsonFile<KeyMetadataFile>(filePath, {
+    const filePath = SecretFileManager.getFilePath(CryptoConstants.METADATA_FILE);
+    return SecretFileManager.loadJsonFile<KeyMetadataFile>(filePath, {
       keys: {},
       lastUpdated: new Date().toISOString(),
     });
   }
 
   private static async saveKeyMetadata(data: KeyMetadataFile): Promise<void> {
-    const filePath = SecretKeyFileManager.getFilePath(RotationConstants.METADATA_FILE);
-    await SecretKeyFileManager.saveJsonFile(filePath, data);
+    const filePath = SecretFileManager.getFilePath(CryptoConstants.METADATA_FILE);
+    await SecretFileManager.saveJsonFile(filePath, data);
   }
 }
