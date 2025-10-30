@@ -4,14 +4,12 @@ import { EnvironmentFileEncryptor } from "../src/cryptography/manager/environmen
 import { CryptoEngine } from "../src/cryptography/engine/cryptoEngine";
 import { CryptoService } from "../src/cryptography/service/cryptoService";
 import { CryptoCoordinator } from "../src/cryptography/service/cryptoCoordinator";
-//import { SecretKeyRotationManager } from "../src/cryptography/key/rotation/secretKeyRotationManager";
 
 type CryptoFixtures = {
   environmentFileEncryptor: EnvironmentFileEncryptor;
   cryptoEngine: CryptoEngine;
   cryptoService: CryptoService;
   cryptoCoordinator: CryptoCoordinator;
-  //secretKeyRotationManager: SecretKeyRotationManager;
 };
 
 export const test = baseTest.extend<CryptoFixtures>({
@@ -26,11 +24,6 @@ export const test = baseTest.extend<CryptoFixtures>({
   cryptoService: async ({}, use) => {
     await use(new CryptoService());
   },
-
-  // secretKeyRotationManager: async ({}, use) => {
-  //   await use(new SecretKeyRotationManager());
-  // },
-
   cryptoCoordinator: async ({ environmentFileEncryptor }, use) => {
     await use(new CryptoCoordinator(environmentFileEncryptor));
   },

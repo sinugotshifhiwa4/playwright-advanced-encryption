@@ -84,8 +84,12 @@ export class CryptoCoordinator {
   }
 
   /**
-   * Encrypts environment variables with tracking
-   * @param envVariables - Optional array of specific variables to encrypt
+   * Encrypts environment variables specified by `envVariables` using the current secret key.
+   * Before encrypting, checks if the secret key is valid and not expired.
+   * If the key has expired, logs a warning and suggests rotating the key using SecretKeyRotationManager.rotateKeyWithReEncryption().
+   * If the key is expiring soon, logs a notice with the number of days until expiration.
+   * @param {string[]} envVariables - Optional list of environment variables to encrypt.
+   * @returns {Promise<void>} - Promise resolved when encryption is complete.
    */
   public async encryptEnvironmentVariables(envVariables?: string[]): Promise<void> {
     try {

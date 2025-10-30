@@ -94,7 +94,7 @@ export default class RotationOrchestrator {
       const duration = Date.now() - startTime;
 
       logger.info(
-        `✓ Key rotation completed successfully for "${currentEnvKey}" ` +
+        `Key rotation completed successfully for "${currentEnvKey}" ` +
           `(${variablesProcessed} variables re-encrypted in ${duration}ms)`,
       );
 
@@ -405,7 +405,11 @@ export default class RotationOrchestrator {
 
       logger.debug(`Rotation tracking updated for "${keyName}"`);
     } catch (error) {
-      logger.error(`Failed to update rotation tracking: ${error}`);
+      ErrorHandler.captureError(
+        error,
+        "updateRotationTracking",
+        "Failed to update rotation tracking",
+      );
       // Don't throw - tracking failure shouldn't break the rotation
     }
   }

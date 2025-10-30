@@ -105,7 +105,6 @@ export default class StagesFileManager {
     envVariable: string,
     value: string,
   ): Promise<void> {
-    // Refactored to use updateEnvironmentVariables internally
     await this.updateEnvironmentVariables(filePath, { [envVariable]: value });
   }
 
@@ -241,7 +240,7 @@ export default class StagesFileManager {
     const lines = [...existingLines];
     const updatedKeys = new Set<string>();
 
-    // First pass: update existing variables
+    // Update existing variables
     for (let i = 0; i < lines.length; i++) {
       const trimmedLine = lines[i].trim();
 
@@ -249,12 +248,12 @@ export default class StagesFileManager {
         if (trimmedLine.startsWith(`${envVariable}=`)) {
           lines[i] = `${envVariable}=${value}`;
           updatedKeys.add(envVariable);
-          break; // Move to next line once a match is found
+          break;
         }
       }
     }
 
-    // Second pass: append variables that weren't found
+    // Append variables that weren't found
     for (const [envVariable, value] of Object.entries(variables)) {
       if (!updatedKeys.has(envVariable)) {
         lines.push(`${envVariable}=${value}`);

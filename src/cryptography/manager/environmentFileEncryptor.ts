@@ -27,7 +27,7 @@ export class EnvironmentFileEncryptor {
     secretKeyVariable: string,
     envVariables?: string[],
   ): Promise<void> {
-    const startTime = Date.now(); // NEW: Track duration
+    const startTime = Date.now();
 
     const envFileLines = await StagesFileManager.readEnvironmentFileAsLines(filePath);
     const allEnvVariables = StagesFileManager.extractEnvironmentVariables(envFileLines);
@@ -43,7 +43,7 @@ export class EnvironmentFileEncryptor {
       return;
     }
 
-    // NEW: Track what was skipped during filtering
+    // Track what was skipped during filtering
     const allCandidates = envVariables?.length
       ? envVariables.filter((v) => this.getTrimmedValue(v))
       : Object.keys(allEnvVariables);
@@ -70,7 +70,7 @@ export class EnvironmentFileEncryptor {
       await StagesFileManager.writeEnvironmentFileLines(filePath, updatedLines);
     }
 
-    // NEW: Track encryption operation
+    // Track encryption operation
     const durationMs = Date.now() - startTime;
     const environment = EnvironmentDetector.getCurrentEnvironmentStage();
 
@@ -254,8 +254,6 @@ export class EnvironmentFileEncryptor {
       `Failed to log encryption summary for ${filePath}`,
     );
   }
-
-  // ===== HELPER METHODS (NEW) =====
 
   /**
    * Centralized error handling wrapper

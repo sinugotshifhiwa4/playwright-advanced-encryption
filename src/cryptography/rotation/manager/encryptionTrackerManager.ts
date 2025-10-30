@@ -84,7 +84,6 @@ export default class EncryptionTrackerManager {
     } catch (error) {
       ErrorHandler.captureError(error, "trackEncryption", "Failed to track encryption operation");
       // Don't throw - tracking failure shouldn't block encryption
-      logger.error(`Failed to track encryption: ${error}`);
     }
   }
 

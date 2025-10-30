@@ -12,8 +12,6 @@ import ErrorHandler from "../../../utils/errorHandling/errorHandler";
 import logger from "../../../utils/logger/loggerManager";
 
 export default class SecretKeyRotationManager {
-  // ==================== VALIDATION ====================
-
   /**
    * Validates that rotation is necessary or forced.
    */
@@ -152,7 +150,7 @@ export default class SecretKeyRotationManager {
           logger.debug(`✓ Decrypted: ${key}`);
         } catch (decryptError) {
           failedVars.push(key);
-          logger.error(`✗ Failed to decrypt "${key}": ${decryptError}`);
+          logger.error(`Failed to decrypt "${key}": ${decryptError}`);
           throw new Error(`Failed to decrypt variable "${key}". Cannot proceed with rotation.`);
         }
       }
@@ -200,7 +198,7 @@ export default class SecretKeyRotationManager {
           const encryptedValue = await this.encryptWithKey(variable.decryptedValue, newKey);
 
           encryptedVariables[variable.key] = encryptedValue;
-          logger.debug(`✓ Re-encrypted: ${variable.key}`);
+          logger.debug(`Re-encrypted: ${variable.key}`);
         } catch (encryptError) {
           failedVariables.push(variable.key);
           logger.error(`✗ Failed to re-encrypt "${variable.key}": ${encryptError}`);
@@ -289,7 +287,11 @@ export default class SecretKeyRotationManager {
       return Object.values(allVariables).filter((value) => CryptoEngine.isEncrypted(value.trim()))
         .length;
     } catch (error) {
-      logger.error(`Failed to count encrypted variables: ${error}`);
+      ErrorHandler.captureError(
+        error,
+        "countEncryptedVariables",
+        "Failed to count encrypted variables",
+      );
       return 0;
     }
   }

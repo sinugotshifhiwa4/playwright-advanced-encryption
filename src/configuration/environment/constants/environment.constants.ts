@@ -8,3 +8,5 @@ export const ENVIRONMENT_CONSTANTS = {
 export const ENVIRONMENT_STAGES = ["dev", "qa", "uat", "preprod", "prod"] as const;
 
 export type EnvironmentStage = (typeof ENVIRONMENT_STAGES)[number];
+
+export type EnvironmentFile = "secret" | "stage";

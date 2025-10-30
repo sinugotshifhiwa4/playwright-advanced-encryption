@@ -8,10 +8,6 @@ import { FileEncoding } from "../../utils/fileManager/internal/file-encoding.enu
 import ErrorHandler from "../../utils/errorHandling/errorHandler";
 
 export class CryptoEngine {
-  // ============================================================================
-  // VALIDATION METHODS
-  // ============================================================================
-
   public static isEncrypted(value: string): boolean {
     if (!value || typeof value !== "string") return false;
     if (!value.startsWith(CRYPTO_CONSTANTS.FORMAT.PREFIX)) return false;

@@ -6,6 +6,7 @@ import SecretFileManager from "../secretFileManager";
 import StagesFileManager from "../stagesFileManager";
 import SecretFilePathResolver from "./secretFilePathResolver";
 import StagesFilePathResolver from "./stagesFilePathResolver";
+import type { EnvironmentFile } from "../../constants/environment.constants";
 import ErrorHandler from "../../../../utils/errorHandling/errorHandler";
 import logger from "../../../../utils/logger/loggerManager";
 
@@ -55,7 +56,7 @@ export default class EnvironmentFileManager {
    * Loads all environment files in sequence
    */
   private async loadAllEnvironments(): Promise<void> {
-    await this.loadEnvironmentFile(SecretFilePathResolver.getSecretFilePath(), "base", (fp) =>
+    await this.loadEnvironmentFile(SecretFilePathResolver.getSecretFilePath(), "secret", (fp) =>
       SecretFileManager.handleMissingEnvFile(fp),
     );
 
@@ -87,7 +88,7 @@ export default class EnvironmentFileManager {
    */
   private async loadEnvironmentFile(
     filePath: string,
-    fileType: "base" | "stage",
+    fileType: EnvironmentFile,
     onMissing?: (filePath: string) => void,
   ): Promise<boolean> {
     try {
@@ -122,8 +123,7 @@ export default class EnvironmentFileManager {
         `Failed to load ${fileType} environment file at ${filePath}`,
       );
 
-      // For base files, re-throw; for stage files, log and continue
-      if (fileType === "base") {
+      if (fileType === "secret") {
         throw error;
       }
       return false;

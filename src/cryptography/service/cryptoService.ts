@@ -8,17 +8,17 @@ export class CryptoService {
    */
   public static async encrypt(value: string, secretKeyVariable: string): Promise<string> {
     try {
-      // Step 1: Validate prerequisites
+      // Validate prerequisites
       const secretKey = await CryptoEngine.validateEncryptionPrerequisites(
         value,
         secretKeyVariable,
       );
 
-      // Step 2: Generate encryption components (returns Web Crypto types)
+      // Generate encryption components (returns Web Crypto types)
       const { salt, iv, encryptionKey, hmacKey } =
         await CryptoEngine.generateEncryptionComponents(secretKey);
 
-      // Step 3: Create encrypted payload using Web Crypto API
+      // Create encrypted payload using Web Crypto API
       return await CryptoEngine.createEncryptedPayload(value, salt, iv, encryptionKey, hmacKey);
     } catch (error) {
       ErrorHandler.captureError(error, "encrypt", "Failed to encrypt with AES-GCM.");

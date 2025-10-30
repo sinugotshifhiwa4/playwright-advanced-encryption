@@ -1,9 +1,9 @@
 import SecretFileManager from "./secretFileManager";
 import * as path from "path";
+import TimestampFormatter from "../../../utils/timestampFormatter";
 import CryptoConstants from "../types/cryptoConstants";
 import { AuditLogEntry, AuditLogFile } from "../types/audit.types";
 import ErrorHandler from "../../../utils/errorHandling/errorHandler";
-import logger from "../../../utils/logger/loggerManager";
 
 export default class SecretAuditManager {
   /**
@@ -12,10 +12,7 @@ export default class SecretAuditManager {
   public static async logAudit(entry: Omit<AuditLogEntry, "timestamp">): Promise<void> {
     try {
       const auditFile = await this.loadAuditLog();
-      const now = new Date().toISOString();
-
-      // for local time: which is UTC + 2 hours
-      //new Date(now).toLocaleString("en-ZA", { timeZone: "Africa/Johannesburg" });
+      const now = TimestampFormatter.getUTCTimestamp();
 
       const auditEntry: AuditLogEntry = {
         timestamp: now,
@@ -33,8 +30,8 @@ export default class SecretAuditManager {
 
       await this.saveAuditLog(auditFile);
     } catch (error) {
+      ErrorHandler.captureError(error, "logAudit", "Failed to log audit");
       // Don't throw on audit log failures to prevent blocking operations
-      logger.error(`Failed to write audit log: ${error}`);
     }
   }
 
