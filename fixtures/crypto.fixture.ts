@@ -24,7 +24,6 @@ export const test = baseTest.extend<CryptoFixtures>({
   cryptoService: async ({}, use) => {
     await use(new CryptoService());
   },
-
   cryptoCoordinator: async ({ environmentFileEncryptor }, use) => {
     await use(new CryptoCoordinator(environmentFileEncryptor));
   },
