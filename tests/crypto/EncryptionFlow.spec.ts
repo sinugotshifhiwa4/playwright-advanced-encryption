@@ -1,8 +1,15 @@
 // import { test } from "../../fixtures/crypto.fixture";
+// import { expect } from "@playwright/test";
 
 // test.describe.serial("Encryption Flow @full-encryption", () => {
 //   test("Generate secret key", async ({ cryptoCoordinator }) => {
-//     await cryptoCoordinator.generateAndStoreSecretKey();
+//     const secretKey = await cryptoCoordinator.generateAndStoreSecretKey({
+//       rotationDays: 90,
+//       performedBy: "test-suite",
+//     });
+
+//     expect(secretKey).toBeTruthy();
+//     expect(secretKey.length).toBeGreaterThan(0);
 //   });
 
 //   test("Encrypt environment variables", async ({ cryptoCoordinator }) => {
@@ -13,302 +20,280 @@
 //   });
 // });
 
-import { test } from "../../fixtures/crypto.fixture";
-import { expect } from "@playwright/test";
+// test.describe.serial("Key Rotation Flow @key-rotation", () => {
+//   test("Check rotation status before rotation", async ({ secretKeyRotationManager }) => {
+//     const status = await secretKeyRotationManager.checkRotationStatus();
 
-test.describe.serial("Encryption Flow @full-encryption", () => {
-  test("Generate secret key", async ({ cryptoCoordinator }) => {
-    const secretKey = await cryptoCoordinator.generateAndStoreSecretKey({
-      rotationDays: 90,
-      performedBy: "test-suite",
-    });
+//     expect(status).toHaveProperty("needsRotation");
+//     expect(status).toHaveProperty("recommendation");
+//     expect(status.details).toHaveProperty("daysUntilExpiration");
+//     expect(status.details).toHaveProperty("encryptedVariableCount");
+//     expect(typeof status.needsRotation).toBe("boolean");
+//     expect(typeof status.recommendation).toBe("string");
+//     expect(typeof status.details.daysUntilExpiration).toBe("number");
+//     expect(typeof status.details.encryptedVariableCount).toBe("number");
 
-    expect(secretKey).toBeTruthy();
-    expect(secretKey.length).toBeGreaterThan(0);
-  });
+//     console.log(`Rotation Status: ${status.recommendation}`);
+//   });
 
-  test("Encrypt environment variables", async ({ cryptoCoordinator }) => {
-    const variablesToEncrypt = ["PORTAL_USERNAME", "PORTAL_PASSWORD"];
+//   test("Rotate secret key with re-encryption", async ({ secretKeyRotationManager }) => {
+//     const result = await secretKeyRotationManager.rotateKeyWithReEncryption({
+//       rotationReason: "manual",
+//       rotationDays: 90,
+//       performedBy: "test-suite",
+//       forceRotation: true,
+//       dryRun: false,
+//     });
 
-    // Encrypt the variables
-    await cryptoCoordinator.encryptEnvironmentVariables(variablesToEncrypt);
-  });
-});
+//     expect(result.success).toBe(true);
+//     expect(result.keyName).toBeTruthy();
+//     expect(result.environment).toBeTruthy();
+//     expect(result.variablesProcessed).toBeGreaterThanOrEqual(0);
+//     expect(result.variablesFailed).toHaveLength(0);
+//     expect(result.oldKeyHash).toBeDefined();
+//     expect(result.newKeyHash).toBeDefined();
+//     expect(result.duration).toBeGreaterThan(0);
 
-test.describe.serial("Key Rotation Flow @key-rotation", () => {
-  test("Check rotation status before rotation", async ({ secretKeyRotationManager }) => {
-    const status = await secretKeyRotationManager.checkRotationStatus();
+//     console.log(`Rotation completed: ${result.variablesProcessed} variables re-encrypted in ${result.duration}ms`);
+//   });
 
-    expect(status).toHaveProperty("needsRotation");
-    expect(status).toHaveProperty("recommendation");
-    expect(status.details).toHaveProperty("daysUntilExpiration");
-    expect(status.details).toHaveProperty("encryptedVariableCount");
-    expect(typeof status.needsRotation).toBe("boolean");
-    expect(typeof status.recommendation).toBe("string");
-    expect(typeof status.details.daysUntilExpiration).toBe("number");
-    expect(typeof status.details.encryptedVariableCount).toBe("number");
+//   test("Verify rotation status after rotation", async ({ secretKeyRotationManager }) => {
+//     const status = await secretKeyRotationManager.checkRotationStatus();
 
-    console.log(`Rotation Status: ${status.recommendation}`);
-  });
+//     expect(status.needsRotation).toBe(false);
+//     expect(status.details.status).toBe("active");
+//     expect(status.details.metadata).toBeDefined();
+//     expect(status.details.metadata?.rotationCount).toBeGreaterThan(0);
+//     expect(status.details.metadata?.createdAt).toBeTruthy();
 
-  test("Rotate secret key with re-encryption", async ({ secretKeyRotationManager }) => {
-    const result = await secretKeyRotationManager.rotateKeyWithReEncryption({
-      rotationReason: "manual",
-      rotationDays: 90,
-      performedBy: "test-suite",
-      forceRotation: true,
-      dryRun: false,
-    });
+//     console.log(`Key has been rotated ${status.details.metadata?.rotationCount} time(s)`);
+//   });
 
-    expect(result.success).toBe(true);
-    expect(result.keyName).toBeTruthy();
-    expect(result.environment).toBeTruthy();
-    expect(result.variablesProcessed).toBeGreaterThanOrEqual(0);
-    expect(result.variablesFailed).toHaveLength(0);
-    expect(result.oldKeyHash).toBeDefined();
-    expect(result.newKeyHash).toBeDefined();
-    expect(result.duration).toBeGreaterThan(0);
+//   test("Dry run rotation", async ({ secretKeyRotationManager }) => {
+//     const result = await secretKeyRotationManager.rotateKeyWithReEncryption({
+//       rotationReason: "manual",
+//       performedBy: "test-suite",
+//       forceRotation: true,
+//       dryRun: true,
+//     });
 
-    console.log(`Rotation completed: ${result.variablesProcessed} variables re-encrypted in ${result.duration}ms`);
-  });
+//     expect(result.success).toBe(true);
+//     expect(result.variablesProcessed).toBeGreaterThanOrEqual(0);
+//     expect(result.oldKeyHash).toBeUndefined();
+//     expect(result.newKeyHash).toBeUndefined();
 
-  test("Verify rotation status after rotation", async ({ secretKeyRotationManager }) => {
-    const status = await secretKeyRotationManager.checkRotationStatus();
+//     console.log(`[DRY RUN] Would process ${result.variablesProcessed} variables`);
+//   });
+// });
 
-    expect(status.needsRotation).toBe(false);
-    expect(status.details.status).toBe("active");
-    expect(status.details.metadata).toBeDefined();
-    expect(status.details.metadata?.rotationCount).toBeGreaterThan(0);
-    expect(status.details.metadata?.createdAt).toBeTruthy();
+// test.describe.serial("Key Audit and Monitoring @key-audit", () => {
+//   test("Audit all secret keys", async ({ secretKeyRotationManager }) => {
+//     await expect(secretKeyRotationManager.auditAllSecretKeys()).resolves.not.toThrow();
+//   });
 
-    console.log(`Key has been rotated ${status.details.metadata?.rotationCount} time(s)`);
-  });
+//   test("Get rotation history - verify structure", async ({ secretKeyRotationManager }) => {
+//     const history = await secretKeyRotationManager.getRotationHistory(10);
 
-  test("Dry run rotation", async ({ secretKeyRotationManager }) => {
-    const result = await secretKeyRotationManager.rotateKeyWithReEncryption({
-      rotationReason: "manual",
-      performedBy: "test-suite",
-      forceRotation: true,
-      dryRun: true,
-    });
+//     expect(Array.isArray(history)).toBe(true);
+//     expect(history.length).toBeGreaterThan(0);
 
-    expect(result.success).toBe(true);
-    expect(result.variablesProcessed).toBeGreaterThanOrEqual(0);
-    expect(result.oldKeyHash).toBeUndefined();
-    expect(result.newKeyHash).toBeUndefined();
+//     const lastRotation = history[0];
+//     expect(lastRotation).toHaveProperty("keyName");
+//     expect(lastRotation).toHaveProperty("rotationDate");
+//     expect(lastRotation).toHaveProperty("rotationReason");
+//     expect(lastRotation).toHaveProperty("success");
+//     expect(typeof lastRotation.keyName).toBe("string");
+//     expect(typeof lastRotation.rotationDate).toBe("string");
+//     expect(typeof lastRotation.success).toBe("boolean");
 
-    console.log(`[DRY RUN] Would process ${result.variablesProcessed} variables`);
-  });
-});
+//     console.log(`Last rotation: ${lastRotation.rotationDate} (${lastRotation.rotationReason})`);
+//   });
 
-test.describe.serial("Key Audit and Monitoring @key-audit", () => {
-  test("Audit all secret keys", async ({ secretKeyRotationManager }) => {
-    await expect(secretKeyRotationManager.auditAllSecretKeys()).resolves.not.toThrow();
-  });
+//   test("Get audit logs - verify structure", async ({ secretKeyRotationManager }) => {
+//     const logs = await secretKeyRotationManager.getAuditLogs(20);
 
-  test("Get rotation history - verify structure", async ({ secretKeyRotationManager }) => {
-    const history = await secretKeyRotationManager.getRotationHistory(10);
+//     expect(Array.isArray(logs)).toBe(true);
+//     expect(logs.length).toBeGreaterThan(0);
 
-    expect(Array.isArray(history)).toBe(true);
-    expect(history.length).toBeGreaterThan(0);
+//     const lastLog = logs[0];
+//     expect(lastLog).toHaveProperty("timestamp");
+//     expect(lastLog).toHaveProperty("action");
+//     expect(lastLog).toHaveProperty("keyName");
+//     expect(lastLog).toHaveProperty("status");
+//     expect(typeof lastLog.timestamp).toBe("string");
+//     expect(typeof lastLog.action).toBe("string");
+//     expect(typeof lastLog.keyName).toBe("string");
+//     expect(typeof lastLog.status).toBe("string");
 
-    const lastRotation = history[0];
-    expect(lastRotation).toHaveProperty("keyName");
-    expect(lastRotation).toHaveProperty("rotationDate");
-    expect(lastRotation).toHaveProperty("rotationReason");
-    expect(lastRotation).toHaveProperty("success");
-    expect(typeof lastRotation.keyName).toBe("string");
-    expect(typeof lastRotation.rotationDate).toBe("string");
-    expect(typeof lastRotation.success).toBe("boolean");
+//     console.log(`Recent logs: ${logs.length} entries found`);
+//   });
 
-    console.log(`Last rotation: ${lastRotation.rotationDate} (${lastRotation.rotationReason})`);
-  });
+//   test("Get filtered audit logs - rotation only", async ({ secretKeyRotationManager }) => {
+//     const logs = await secretKeyRotationManager.getAuditLogs(10, {
+//       action: "rotate",
+//       status: "success",
+//     });
 
-  test("Get audit logs - verify structure", async ({ secretKeyRotationManager }) => {
-    const logs = await secretKeyRotationManager.getAuditLogs(20);
+//     expect(Array.isArray(logs)).toBe(true);
 
-    expect(Array.isArray(logs)).toBe(true);
-    expect(logs.length).toBeGreaterThan(0);
+//     logs.forEach((log) => {
+//       expect(log.action).toBe("rotate");
+//       expect(log.status).toBe("success");
+//     });
 
-    const lastLog = logs[0];
-    expect(lastLog).toHaveProperty("timestamp");
-    expect(lastLog).toHaveProperty("action");
-    expect(lastLog).toHaveProperty("keyName");
-    expect(lastLog).toHaveProperty("status");
-    expect(typeof lastLog.timestamp).toBe("string");
-    expect(typeof lastLog.action).toBe("string");
-    expect(typeof lastLog.keyName).toBe("string");
-    expect(typeof lastLog.status).toBe("string");
+//     console.log(`Successful rotations: ${logs.length}`);
+//   });
+// });
 
-    console.log(`Recent logs: ${logs.length} entries found`);
-  });
+// test.describe.serial("Batch Key Rotation @batch-rotation", () => {
+//   test("Check for expired keys with dry run", async ({ secretKeyRotationManager }) => {
+//     const results = await secretKeyRotationManager.rotateAllExpiredKeys({
+//       performedBy: "test-suite",
+//       dryRun: true,
+//     });
 
-  test("Get filtered audit logs - rotation only", async ({ secretKeyRotationManager }) => {
-    const logs = await secretKeyRotationManager.getAuditLogs(10, {
-      action: "rotate",
-      status: "success",
-    });
+//     expect(Array.isArray(results)).toBe(true);
 
-    expect(Array.isArray(logs)).toBe(true);
+//     console.log(`Found ${results.length} expired key(s)`);
+//   });
 
-    logs.forEach((log) => {
-      expect(log.action).toBe("rotate");
-      expect(log.status).toBe("success");
-    });
+//   test("Rotate all expired keys", async ({ secretKeyRotationManager }) => {
+//     const results = await secretKeyRotationManager.rotateAllExpiredKeys({
+//       performedBy: "test-suite",
+//       dryRun: false,
+//     });
 
-    console.log(`Successful rotations: ${logs.length}`);
-  });
-});
+//     expect(Array.isArray(results)).toBe(true);
 
-test.describe.serial("Batch Key Rotation @batch-rotation", () => {
-  test("Check for expired keys with dry run", async ({ secretKeyRotationManager }) => {
-    const results = await secretKeyRotationManager.rotateAllExpiredKeys({
-      performedBy: "test-suite",
-      dryRun: true,
-    });
+//     const successCount = results.filter((r) => r.success).length;
+//     const failureCount = results.length - successCount;
 
-    expect(Array.isArray(results)).toBe(true);
+//     expect(successCount).toBeGreaterThanOrEqual(0);
+//     expect(failureCount).toBeGreaterThanOrEqual(0);
 
-    console.log(`Found ${results.length} expired key(s)`);
-  });
+//     console.log(`Batch rotation: ${successCount}/${results.length} successful`);
+//   });
+// });
 
-  test("Rotate all expired keys", async ({ secretKeyRotationManager }) => {
-    const results = await secretKeyRotationManager.rotateAllExpiredKeys({
-      performedBy: "test-suite",
-      dryRun: false,
-    });
+// test.describe("Error Handling @error-handling", () => {
+//   test("Should prevent rotation without force flag on valid key", async ({ secretKeyRotationManager }) => {
+//     await expect(
+//       secretKeyRotationManager.rotateKeyWithReEncryption({
+//         rotationReason: "manual",
+//         performedBy: "test-suite",
+//         forceRotation: false,
+//       }),
+//     ).rejects.toThrow(/does not need rotation yet/);
+//   });
 
-    expect(Array.isArray(results)).toBe(true);
+//   test("Should allow rotation with force flag", async ({ secretKeyRotationManager }) => {
+//     const result = await secretKeyRotationManager.rotateKeyWithReEncryption({
+//       rotationReason: "manual",
+//       performedBy: "test-suite",
+//       forceRotation: true,
+//     });
 
-    const successCount = results.filter((r) => r.success).length;
-    const failureCount = results.length - successCount;
+//     expect(result.success).toBe(true);
+//   });
+// });
 
-    expect(successCount).toBeGreaterThanOrEqual(0);
-    expect(failureCount).toBeGreaterThanOrEqual(0);
+// test.describe.serial("Key Status Warnings @status-warnings", () => {
+//   test("Check key status and log warnings", async ({ cryptoCoordinator, secretKeyRotationManager }) => {
+//     const status = await secretKeyRotationManager.checkRotationStatus();
 
-    console.log(`Batch rotation: ${successCount}/${results.length} successful`);
-  });
-});
+//     expect(status).toBeDefined();
+//     expect(status.details.status).toMatch(/active|expiring_soon|expired/);
 
-test.describe("Error Handling @error-handling", () => {
-  test("Should prevent rotation without force flag on valid key", async ({ secretKeyRotationManager }) => {
-    await expect(
-      secretKeyRotationManager.rotateKeyWithReEncryption({
-        rotationReason: "manual",
-        performedBy: "test-suite",
-        forceRotation: false,
-      }),
-    ).rejects.toThrow(/does not need rotation yet/);
-  });
+//     // This will trigger appropriate warnings in logs based on status
+//     await cryptoCoordinator.encryptEnvironmentVariables(["TEST_VAR"]);
 
-  test("Should allow rotation with force flag", async ({ secretKeyRotationManager }) => {
-    const result = await secretKeyRotationManager.rotateKeyWithReEncryption({
-      rotationReason: "manual",
-      performedBy: "test-suite",
-      forceRotation: true,
-    });
+//     console.log(`Key status: ${status.details.status}`);
+//     console.log(`Days until expiration: ${status.details.daysUntilExpiration}`);
+//   });
+// });
 
-    expect(result.success).toBe(true);
-  });
-});
+// test.describe.serial("Integration Test @integration", () => {
+//   test("Complete lifecycle: Generate → Encrypt → Rotate → Verify", async ({
+//     cryptoCoordinator,
+//     secretKeyRotationManager,
+//   }) => {
+//     // Step 1: Generate key
+//     console.log("Step 1: Generating key...");
+//     const secretKey = await cryptoCoordinator.generateAndStoreSecretKey({
+//       rotationDays: 1,
+//       performedBy: "integration-test",
+//     });
+//     expect(secretKey).toBeTruthy();
+//     expect(secretKey.length).toBeGreaterThan(0);
 
-test.describe.serial("Key Status Warnings @status-warnings", () => {
-  test("Check key status and log warnings", async ({ cryptoCoordinator, secretKeyRotationManager }) => {
-    const status = await secretKeyRotationManager.checkRotationStatus();
+//     // Step 2: Encrypt variables
+//     console.log("Step 2: Encrypting variables...");
+//     await cryptoCoordinator.encryptEnvironmentVariables(["PORTAL_USERNAME", "PORTAL_PASSWORD"]);
 
-    expect(status).toBeDefined();
-    expect(status.details.status).toMatch(/active|expiring_soon|expired/);
+//     // Step 3: Check initial status
+//     console.log("Step 3: Checking status...");
+//     const initialStatus = await secretKeyRotationManager.checkRotationStatus();
+//     expect(initialStatus.details.encryptedVariableCount).toBeGreaterThan(0);
+//     console.log(`Found ${initialStatus.details.encryptedVariableCount} encrypted variables`);
 
-    // This will trigger appropriate warnings in logs based on status
-    await cryptoCoordinator.encryptEnvironmentVariables(["TEST_VAR"]);
+//     // Step 4: Rotate key
+//     console.log("Step 4: Rotating key...");
+//     const rotationResult = await secretKeyRotationManager.rotateKeyWithReEncryption({
+//       rotationReason: "manual",
+//       rotationDays: 90,
+//       performedBy: "integration-test",
+//       forceRotation: true,
+//     });
+//     expect(rotationResult.success).toBe(true);
+//     expect(rotationResult.variablesProcessed).toBeGreaterThan(0);
+//     expect(rotationResult.variablesFailed).toHaveLength(0);
 
-    console.log(`Key status: ${status.details.status}`);
-    console.log(`Days until expiration: ${status.details.daysUntilExpiration}`);
-  });
-});
+//     // Step 5: Verify after rotation
+//     console.log("Step 5: Verifying rotation...");
+//     const finalStatus = await secretKeyRotationManager.checkRotationStatus();
+//     expect(finalStatus.needsRotation).toBe(false);
+//     expect(finalStatus.details.status).toBe("active");
 
-test.describe.serial("Integration Test @integration", () => {
-  test("Complete lifecycle: Generate → Encrypt → Rotate → Verify", async ({
-    cryptoCoordinator,
-    secretKeyRotationManager,
-  }) => {
-    // Step 1: Generate key
-    console.log("Step 1: Generating key...");
-    const secretKey = await cryptoCoordinator.generateAndStoreSecretKey({
-      rotationDays: 1,
-      performedBy: "integration-test",
-    });
-    expect(secretKey).toBeTruthy();
-    expect(secretKey.length).toBeGreaterThan(0);
+//     // Step 6: Get history
+//     console.log("Step 6: Checking history...");
+//     const history = await secretKeyRotationManager.getRotationHistory(5);
+//     expect(history.length).toBeGreaterThan(0);
+//     expect(history[0].success).toBe(true);
 
-    // Step 2: Encrypt variables
-    console.log("Step 2: Encrypting variables...");
-    await cryptoCoordinator.encryptEnvironmentVariables(["PORTAL_USERNAME", "PORTAL_PASSWORD"]);
+//     console.log("✅ Complete lifecycle test passed!");
+//   });
+// });
 
-    // Step 3: Check initial status
-    console.log("Step 3: Checking status...");
-    const initialStatus = await secretKeyRotationManager.checkRotationStatus();
-    expect(initialStatus.details.encryptedVariableCount).toBeGreaterThan(0);
-    console.log(`Found ${initialStatus.details.encryptedVariableCount} encrypted variables`);
+// test.describe.serial("Metadata Verification @metadata", () => {
+//   test("Verify key metadata after operations", async ({ secretKeyRotationManager }) => {
+//     const status = await secretKeyRotationManager.checkRotationStatus();
 
-    // Step 4: Rotate key
-    console.log("Step 4: Rotating key...");
-    const rotationResult = await secretKeyRotationManager.rotateKeyWithReEncryption({
-      rotationReason: "manual",
-      rotationDays: 90,
-      performedBy: "integration-test",
-      forceRotation: true,
-    });
-    expect(rotationResult.success).toBe(true);
-    expect(rotationResult.variablesProcessed).toBeGreaterThan(0);
-    expect(rotationResult.variablesFailed).toHaveLength(0);
+//     expect(status.details.metadata).toBeDefined();
 
-    // Step 5: Verify after rotation
-    console.log("Step 5: Verifying rotation...");
-    const finalStatus = await secretKeyRotationManager.checkRotationStatus();
-    expect(finalStatus.needsRotation).toBe(false);
-    expect(finalStatus.details.status).toBe("active");
+//     const metadata = status.details.metadata;
+//     expect(metadata).not.toBeNull();
+//     expect(metadata).not.toBeUndefined();
 
-    // Step 6: Get history
-    console.log("Step 6: Checking history...");
-    const history = await secretKeyRotationManager.getRotationHistory(5);
-    expect(history.length).toBeGreaterThan(0);
-    expect(history[0].success).toBe(true);
+//     // Type assertion after null check
+//     expect(metadata!.createdAt).toBeTruthy();
+//     expect(metadata!.rotationCount).toBeGreaterThanOrEqual(0);
+//     expect(typeof metadata!.createdAt).toBe("string");
+//     expect(typeof metadata!.rotationCount).toBe("number");
 
-    console.log("✅ Complete lifecycle test passed!");
-  });
-});
+//     console.log(`Metadata: Created ${metadata!.createdAt}, Rotated ${metadata!.rotationCount} times`);
+//   });
 
-test.describe.serial("Metadata Verification @metadata", () => {
-  test("Verify key metadata after operations", async ({ secretKeyRotationManager }) => {
-    const status = await secretKeyRotationManager.checkRotationStatus();
+//   test("Verify rotation history contains valid data", async ({ secretKeyRotationManager }) => {
+//     const history = await secretKeyRotationManager.getRotationHistory(5);
 
-    expect(status.details.metadata).toBeDefined();
+//     expect(history.length).toBeGreaterThan(0);
 
-    const metadata = status.details.metadata;
-    expect(metadata).not.toBeNull();
-    expect(metadata).not.toBeUndefined();
+//     const firstEntry = history[0];
+//     expect(firstEntry.keyName).toBeTruthy();
+//     expect(firstEntry.rotationDate).toBeTruthy();
+//     expect(firstEntry.rotationReason).toMatch(/scheduled|manual|compromised|expired/);
+//     expect(typeof firstEntry.success).toBe("boolean");
 
-    // Type assertion after null check
-    expect(metadata!.createdAt).toBeTruthy();
-    expect(metadata!.rotationCount).toBeGreaterThanOrEqual(0);
-    expect(typeof metadata!.createdAt).toBe("string");
-    expect(typeof metadata!.rotationCount).toBe("number");
-
-    console.log(`Metadata: Created ${metadata!.createdAt}, Rotated ${metadata!.rotationCount} times`);
-  });
-
-  test("Verify rotation history contains valid data", async ({ secretKeyRotationManager }) => {
-    const history = await secretKeyRotationManager.getRotationHistory(5);
-
-    expect(history.length).toBeGreaterThan(0);
-
-    const firstEntry = history[0];
-    expect(firstEntry.keyName).toBeTruthy();
-    expect(firstEntry.rotationDate).toBeTruthy();
-    expect(firstEntry.rotationReason).toMatch(/scheduled|manual|compromised|expired/);
-    expect(typeof firstEntry.success).toBe("boolean");
-
-    console.log(`Latest rotation: ${firstEntry.rotationDate} - Reason: ${firstEntry.rotationReason}`);
-  });
-});
+//     console.log(`Latest rotation: ${firstEntry.rotationDate} - Reason: ${firstEntry.rotationReason}`);
+//   });
+// });

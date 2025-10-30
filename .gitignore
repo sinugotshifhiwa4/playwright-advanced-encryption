@@ -13,6 +13,7 @@ node_modules/
 /downloads/
 /cryptoTracking/
 /cryptoAudit/
+/cryptoAuditTracker/
 results.trx
 results.xml
 
